@@ -28,6 +28,7 @@ import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
 import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
+import com.gyf.immersionbar.ImmersionBar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefUtils = new SharedPrefUtils(this);
 
         //根據時段選擇背景顏色
-        getCurrentMode();
         setCurrentMode();
         getCurrentMode();
 
@@ -169,11 +169,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //根據當前模式，選擇背景顏色
+    //根據當前模式，選擇佈景主題
     private void getCurrentMode(){
+        int bgColor;
         if(sharedPrefUtils.getLastMode() == 0)
-            linMain.setBackgroundColor(getResources().getColor(R.color.light_bg));
+            bgColor = R.color.light_bg;
         else
-            linMain.setBackgroundColor(getResources().getColor(R.color.night_bg));
+            bgColor = R.color.night_bg;
+
+        //設定背景顏色
+        linMain.setBackgroundColor(getResources().getColor(bgColor));
+        //設定狀態欄顏色
+        ImmersionBar.with(this)
+                .statusBarDarkFont(sharedPrefUtils.getLastMode() == 0)
+                .statusBarColor(bgColor)
+                .fitsSystemWindows(true)   //避免畫面上方和通知欄重疊到
+                .navigationBarDarkIcon(sharedPrefUtils.getLastMode() == 0)
+                .navigationBarColor(bgColor)
+                .init();
     }
 }
