@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.weather.api.WeatherApi;
@@ -25,11 +26,16 @@ public class MainActivity extends AppCompatActivity {
 
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
+    private TextView txtTown, txtCurrentTemp, txtCurrentDesc, txtCurrentTempRange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        txtTown = findViewById(R.id.txt_town);
+        txtCurrentTemp = findViewById(R.id.txt_current_temp);
+        txtCurrentDesc = findViewById(R.id.txt_current_desc);
+        txtCurrentTempRange = findViewById(R.id.txt_current_temp_range);
 
         cityModel = new CityModel();
         weatherFutureModel = new WeatherFutureModel();
@@ -81,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
             cityModel.setMyCity(Constants.defaultCity);
         }
 
+        txtTown.setText(cityModel.getMyCountry()+cityModel.getMyCity());
+
         //呼叫中央氣象局的api
         WeatherApi weatherApi = new WeatherApi(this);
         weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
@@ -104,9 +112,21 @@ public class MainActivity extends AppCompatActivity {
             //設定該地區的天氣資訊
             weatherFutureModel.setLocation(data.getWeatherRecord().getLocations().get(0).getLocation());
             weatherFutureModel.setWeatherElements(cityModel.getMyCity());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //取得當日溫度
+                    txtCurrentTemp.setText(weatherFutureModel.getNowTemp() + "°C");
+                    txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
+                    //取得當日天氣最高最低溫
+                    String maxTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[0];
+                    String minTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[1];
+                    txtCurrentTempRange.setText(maxTemp + "°C/" + minTemp + "°C");
+                }
+            });
             Log.d("DATA:", String.valueOf(DateTimeUtils.compareDateTime(DateTimeUtils.getNowTime(),
                     DateTimeUtils.convertStringToDate("2023-01-01 02:02:32"))));
-            Log.d("DATA:", weatherFutureModel.getMaxMinRealTempByDate(DateTimeUtils.convertStringToDate("2023-01-04 02:02:32"))[0]);
+            Log.d("DATA:", weatherFutureModel.getMaxMinRealTempByDate(DateTimeUtils.convertStringToDate("2023-01-10 02:02:32"))[0]);
         }
     };
 }
