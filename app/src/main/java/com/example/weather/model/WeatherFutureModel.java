@@ -9,8 +9,10 @@ import com.example.weather.utils.DateTimeUtils;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 未來一週天氣處理的相關邏輯
@@ -467,5 +469,30 @@ public class WeatherFutureModel {
             }
         }
         return map;
+    }
+
+    /**
+     * 獲取某日最大降雨機率
+     *
+     * @param datetime  2023-01-01 00:00:00
+     * @return int 60
+     *
+     */
+    public int getMaxRainProbByDate(Date datetime) {
+        Map<String, String> map = getRainProbByDate(datetime);
+        int maxProb = 0;
+        Set keySet = map.keySet();
+        //有了set集合就可以獲取迭代器
+        for (Object o : keySet) {
+            String key = String.valueOf(o);
+            //有了鍵就可以通過map集合的get方法獲取其對應的値
+            String val = map.get(key);
+            if(" ".equals(val))
+                val = "0";
+            int value = Integer.parseInt(val);
+            if (value >= maxProb)
+                maxProb = value;
+        }
+        return maxProb;
     }
 }

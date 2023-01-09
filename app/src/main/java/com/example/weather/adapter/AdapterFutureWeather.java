@@ -25,7 +25,7 @@ public class AdapterFutureWeather extends RecyclerView.Adapter<AdapterFutureWeat
     private WeatherFutureModel weatherFutureModel;
     private List<String> maxTempArr;   //最高溫度
     private List<String> minTempArr;   //最低溫度
-    private List<Map<String, String>> rainProbArr;   //降雨機率
+    private List<Integer> rainProbArr;   //降雨機率
     private List<String> phenomenonArr;   //天氣現象
     private final int predictDay = 7;    //要預測幾天
 
@@ -43,6 +43,7 @@ public class AdapterFutureWeather extends RecyclerView.Adapter<AdapterFutureWeat
             minTempArr.add(minTemp);
             String phenomenonValue = weatherFutureModel.getPhenomenonByDate(DateTimeUtils.convertStringToDate(date))[1];
             phenomenonArr.add(phenomenonValue);
+            rainProbArr.add(weatherFutureModel.getMaxRainProbByDate(DateTimeUtils.convertStringToDate(date)));
         }
     }
 
@@ -71,11 +72,13 @@ public class AdapterFutureWeather extends RecyclerView.Adapter<AdapterFutureWeat
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // 顯示天氣資訊
-        String date = DateTimeUtils.convertDistinctFormat("MM/dd",
-                DateTimeUtils.convertStringToDate(DateTimeUtils.getAddDistinctDate(position + 1)));
+        Date d = DateTimeUtils.convertStringToDate(DateTimeUtils.getAddDistinctDate(position + 1));
+        String date = DateTimeUtils.convertDistinctFormat("MM/dd", d);
         holder.imgWeather.setImageResource(WeatherImg.getImgByWeather(Integer.parseInt(phenomenonArr.get(position))));
-        holder.txtDate.setText(date);
+        holder.txtDate.setText(date
+                + " (" + DateTimeUtils.getWeekOfDate(d) + ")");
         holder.txtTempRange.setText(maxTempArr.get(position) + "°C/" + minTempArr.get(position) + "°C");
+        holder.txtRain.setText(rainProbArr.get(position) + "%");
     }
 
     @Override

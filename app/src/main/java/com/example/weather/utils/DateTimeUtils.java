@@ -87,4 +87,20 @@ public class DateTimeUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.TAIWAN);
         return sdf.format(datetime);
     }
+
+    /**
+     * 根據日期取得星期幾
+     *
+     * @param datetime  日期時間    Sun Jan 01 04:50:25 GMT 2023
+     * @return String  星期日
+     */
+    public static String getWeekOfDate(Date datetime) {
+        String[] weekDays = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(datetime);
+        int w = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        if (w < 0)
+            w = 0;
+        return weekDays[w];
+    }
 }
