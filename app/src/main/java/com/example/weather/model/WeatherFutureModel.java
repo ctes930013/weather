@@ -440,7 +440,8 @@ public class WeatherFutureModel {
         String date = DateTimeUtils.getDateByDatetime(datetime);
         List<WeatherElement.Times> phenomenonList = getPhenomenonList();
         for (int i = 0; i < phenomenonList.size(); i++){
-            if(phenomenonList.get(i).getStartTime().contains(date)){
+            if(phenomenonList.get(i).getEndTime().contains(date)
+                    || phenomenonList.get(i).getStartTime().contains(date)){
                 phenomenon[0] = phenomenonList.get(i).getElementValue().get(0).getValue();
                 phenomenon[1] = phenomenonList.get(i).getElementValue().get(1).getValue();
                 break;

@@ -58,7 +58,33 @@ public class DateTimeUtils {
      * @return String  2023-01-01
      */
     public static String getDateByDatetime(Date datetime){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.TAIWAN);
+        return convertDistinctFormat("yyyy-MM-dd", datetime);
+    }
+
+    /**
+     * 取得當前日期往後加上幾天的日期
+     *
+     * @param count  要加上幾天
+     * @return String  2023-01-01
+     */
+    public static String getAddDistinctDate(int count){
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(Calendar.DAY_OF_YEAR, count);
+        Date date = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.TAIWAN);
+        return sdf.format(date);
+    }
+
+    /**
+     * 將日期轉換為特定格式
+     *
+     * @param format  yyyy-MM-dd
+     * @param datetime  日期時間    Sun Jan 01 04:50:25 GMT 2023
+     * @return String  2023-01-01
+     */
+    public static String convertDistinctFormat(String format, Date datetime){
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.TAIWAN);
         return sdf.format(datetime);
     }
 }

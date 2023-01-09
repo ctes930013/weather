@@ -3,6 +3,8 @@ package com.example.weather;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -10,9 +12,11 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.weather.adapter.AdapterFutureWeather;
 import com.example.weather.api.WeatherApi;
 import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
@@ -21,21 +25,28 @@ import com.example.weather.network.APICallback;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
+import com.example.weather.utils.WeatherImg;
 
 public class MainActivity extends AppCompatActivity {
 
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
+    private ImageView imgCurrentWeather;
     private TextView txtTown, txtCurrentTemp, txtCurrentDesc, txtCurrentTempRange;
+    private RecyclerView recyclerViewWeather;
+    private AdapterFutureWeather adapterFutureWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        imgCurrentWeather = findViewById(R.id.img_current_weather);
         txtTown = findViewById(R.id.txt_town);
         txtCurrentTemp = findViewById(R.id.txt_current_temp);
         txtCurrentDesc = findViewById(R.id.txt_current_desc);
         txtCurrentTempRange = findViewById(R.id.txt_current_temp_range);
+        recyclerViewWeather = findViewById(R.id.recycler_view_weather);
+        recyclerViewWeather.setLayoutManager(new LinearLayoutManager(this));
 
         cityModel = new CityModel();
         weatherFutureModel = new WeatherFutureModel();
@@ -116,12 +127,18 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //取得當日溫度
+                    imgCurrentWeather.setImageResource(
+                            WeatherImg.getImgByWeather(Integer.parseInt(weatherFutureModel.getNowPhenomenon()[1])));
                     txtCurrentTemp.setText(weatherFutureModel.getNowTemp() + "°C");
                     txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
                     //取得當日天氣最高最低溫
                     String maxTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[0];
                     String minTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[1];
                     txtCurrentTempRange.setText(maxTemp + "°C/" + minTemp + "°C");
+
+                    //取得未來幾天天氣預報
+                    adapterFutureWeather = new AdapterFutureWeather(weatherFutureModel);
+                    recyclerViewWeather.setAdapter(adapterFutureWeather);
                 }
             });
             Log.d("DATA:", String.valueOf(DateTimeUtils.compareDateTime(DateTimeUtils.getNowTime(),
