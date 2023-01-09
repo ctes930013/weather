@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +26,15 @@ import com.example.weather.network.APICallback;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
+import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
 
 public class MainActivity extends AppCompatActivity {
 
+    private SharedPrefUtils sharedPrefUtils;
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
+    private LinearLayout linMain;
     private ImageView imgCurrentWeather;
     private TextView txtTown, txtCurrentTemp, txtCurrentDesc, txtCurrentTempRange;
     private RecyclerView recyclerViewWeather;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        linMain = findViewById(R.id.lin_main);
         imgCurrentWeather = findViewById(R.id.img_current_weather);
         txtTown = findViewById(R.id.txt_town);
         txtCurrentTemp = findViewById(R.id.txt_current_temp);
@@ -47,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
         txtCurrentTempRange = findViewById(R.id.txt_current_temp_range);
         recyclerViewWeather = findViewById(R.id.recycler_view_weather);
         recyclerViewWeather.setLayoutManager(new LinearLayoutManager(this));
+        sharedPrefUtils = new SharedPrefUtils(this);
+
+        //根據時段選擇背景顏色
+        getCurrentMode();
+        setCurrentMode();
+        getCurrentMode();
+
 
         cityModel = new CityModel();
         weatherFutureModel = new WeatherFutureModel();
@@ -146,4 +158,22 @@ public class MainActivity extends AppCompatActivity {
             Log.d("DATA:", weatherFutureModel.getMaxMinRealTempByDate(DateTimeUtils.convertStringToDate("2023-01-10 02:02:32"))[0]);
         }
     };
+
+    //設定當前模式
+    private void setCurrentMode(){
+        int hours = Integer.parseInt(DateTimeUtils.convertDistinctFormat("HH", DateTimeUtils.getNowTime()));
+        if (hours >= 6 && hours <= 18) {
+            sharedPrefUtils.setLastMode(0);
+        } else {
+            sharedPrefUtils.setLastMode(1);
+        }
+    }
+
+    //根據當前模式，選擇背景顏色
+    private void getCurrentMode(){
+        if(sharedPrefUtils.getLastMode() == 0)
+            linMain.setBackgroundColor(getResources().getColor(R.color.light_bg));
+        else
+            linMain.setBackgroundColor(getResources().getColor(R.color.night_bg));
+    }
 }
