@@ -18,6 +18,12 @@ public class SharedPrefUtils {
 
     //紀錄操作時段是晚上還是白天
     String currentMode = "current_Mode";
+    //紀錄天氣的地區模式
+    String regionMode = "region_mode";
+    //紀錄天氣的縣市
+    String regionCounty = "region_county";
+    //紀錄天氣的鄉鎮市區
+    String regionCity = "region_city";
 
     /**
      * 設定紀錄操作時段
@@ -39,5 +45,71 @@ public class SharedPrefUtils {
     public int getLastMode(){
         SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
         return pref.getInt(currentMode, 0);
+    }
+
+    /**
+     * 設定紀錄天氣的地區模式
+     *
+     * @param mode  當前選用模式，1:GPS，2:手動選擇
+     */
+    public void setRegionMode(int mode){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        pref.edit()
+                .putInt(regionMode, mode)
+                .commit();
+    }
+
+    /**
+     * 設定紀錄天氣的地區模式
+     *
+     * @return int  1:GPS，2:手動選擇
+     */
+    public int getRegionMode(){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        return pref.getInt(regionMode, 1);
+    }
+
+    /**
+     * 設定紀錄天氣的縣市
+     *
+     * @param county  當前選擇縣市
+     */
+    public void setRegionCounty(String county){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        pref.edit()
+                .putString(regionCounty, county)
+                .commit();
+    }
+
+    /**
+     * 取得紀錄天氣的縣市
+     *
+     * @return String  縣市
+     */
+    public String getRegionCounty(){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        return pref.getString(regionCounty, "");
+    }
+
+    /**
+     * 設定紀錄天氣的鄉鎮市區
+     *
+     * @param city  當前選擇鄉鎮市區
+     */
+    public void setRegionCity(String city){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        pref.edit()
+                .putString(regionCity, city)
+                .commit();
+    }
+
+    /**
+     * 取得紀錄天氣的鄉鎮市區
+     *
+     * @return String  縣市
+     */
+    public String getRegionCity(){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        return pref.getString(regionCity, "");
     }
 }

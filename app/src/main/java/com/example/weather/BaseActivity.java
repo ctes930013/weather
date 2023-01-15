@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.gyf.immersionbar.ImmersionBar;
+
 public abstract class BaseActivity extends AppCompatActivity {
 
     private ImageView imgBack;
@@ -18,6 +20,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentId());
         imgBack = findViewById(R.id.img_back);
         txtTitle = findViewById(R.id.txt_title);
+
+        //設定狀態欄顏色
+        ImmersionBar.with(this)
+                .statusBarDarkFont(true)
+                .statusBarColor(R.color.white)
+                .fitsSystemWindows(true)   //避免畫面上方和通知欄重疊到
+                .navigationBarDarkIcon(true)
+                .navigationBarColor(R.color.white)
+                .init();
 
         //返回上一頁
         imgBack.setOnClickListener(new View.OnClickListener() {
