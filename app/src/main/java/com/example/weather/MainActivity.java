@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -26,10 +25,10 @@ import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
-import com.example.weather.page.Settings;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
+import com.example.weather.utils.Route;
 import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
 import com.gyf.immersionbar.ImmersionBar;
@@ -84,9 +83,8 @@ public class MainActivity extends AppCompatActivity {
         imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, Settings.class);
-                startActivity(intent);
+                Route route = new Route(MainActivity.this);
+                route.toSettings();
             }
         });
     }

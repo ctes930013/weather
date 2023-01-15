@@ -5,22 +5,22 @@
     android:layout_marginTop="6dp">
 
     <TextView
-        android:id="@+id/txt_settings"
+        android:id="@+id/txt_city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/img_settings"
+        android:layout_toStartOf="@+id/img_mark"
         android:layout_centerVertical="true"
-        android:text="設定"
+        android:text="豐原區"
         android:textAlignment="textStart"
         android:textColor="@color/black"
         android:textSize="18sp" />
 
     <ImageView
-        android:id="@+id/img_settings"
+        android:id="@+id/img_mark"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/next"/>
+        android:src="@drawable/checkmark"/>
 </RelativeLayout>

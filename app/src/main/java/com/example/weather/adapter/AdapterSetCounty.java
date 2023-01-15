@@ -14,13 +14,13 @@ import com.example.weather.utils.OnItemClickListener;
 
 import java.util.List;
 
-public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHolder> {
+public class AdapterSetCounty extends RecyclerView.Adapter<AdapterSetCounty.ViewHolder> {
 
-    private List<String> settingsArr;   //設定
+    private List<String> countyArr;   //縣市陣列
     private OnItemClickListener listener; //點擊觸發事件
 
-    public AdapterSettings(List<String> settingsArr) {
-        this.settingsArr = settingsArr;
+    public AdapterSetCounty(List<String> countyArr) {
+        this.countyArr = countyArr;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -30,11 +30,11 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
     // 建立ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder{
         // 宣告元件
-        private TextView txtSettings;
+        private TextView txtCounty;
 
         ViewHolder(View itemView) {
             super(itemView);
-            txtSettings = (TextView) itemView.findViewById(R.id.txt_settings);
+            txtCounty = (TextView) itemView.findViewById(R.id.txt_county);
         }
     }
 
@@ -42,13 +42,13 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.adapter_settings, parent, false);
+                .inflate(R.layout.adpater_set_county, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        holder.txtSettings.setText(settingsArr.get(position));
+        holder.txtCounty.setText(countyArr.get(position));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +61,6 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
 
     @Override
     public int getItemCount() {
-        return settingsArr.size();
+        return countyArr.size();
     }
 }

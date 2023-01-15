@@ -52,11 +52,12 @@ public class Settings extends BaseActivity {
             @Override
             public void onItemClick(int position) {
                 switch (position) {
-                    case 1:
+                    case 0:
                         showRegionModeDialog();
                         break;
-                    case 2:
-                        showRegionModeDialog();
+                    case 1:
+                        Route route = new Route(Settings.this);
+                        route.toSetCounty();
                         break;
                     default:
                         break;

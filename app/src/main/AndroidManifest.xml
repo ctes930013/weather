@@ -65,6 +65,18 @@
             android:screenOrientation="portrait"
             android:exported="true">
         </activity>
+
+        <activity
+            android:name=".page.SetCounty"
+            android:screenOrientation="portrait"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".page.SetCity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

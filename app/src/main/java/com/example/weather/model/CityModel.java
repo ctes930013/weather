@@ -3,6 +3,7 @@ package com.example.weather.model;
 import com.example.weather.data.Location;
 import com.example.weather.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -203,6 +204,29 @@ public class CityModel {
         put("金門縣", "F-D0047-085");
         put("連江縣", "F-D0047-081");
     }};
+
+    /**
+     * 取得所有縣市
+     *
+     * @return List<String>  所有縣市陣列
+     */
+    public List<String> getAllCounty(){
+        List<String> countyArr = new ArrayList<>();
+        countyArr.addAll(cityData.keySet());
+        return countyArr;
+    }
+
+    /**
+     * 根據縣市取得所有鄉鎮市區
+     *
+     * @param county  縣市
+     * @return List<String>  所有鄉鎮市區陣列
+     */
+    public List<String> getAllCityByCounty(String county){
+        List<String> cityArr = new ArrayList<>();
+        cityArr.addAll(cityData.get(county));
+        return cityArr;
+    }
 
     /**
      * 根據鄉鎮市區取得對應的縣市

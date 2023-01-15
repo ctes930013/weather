@@ -5,13 +5,13 @@
     android:layout_marginTop="6dp">
 
     <TextView
-        android:id="@+id/txt_settings"
+        android:id="@+id/txt_county"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/img_settings"
         android:layout_centerVertical="true"
-        android:text="設定"
+        android:text="台中市"
         android:textAlignment="textStart"
         android:textColor="@color/black"
         android:textSize="18sp" />
