@@ -6,6 +6,7 @@ import com.example.weather.utils.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class CityModel {
      * 各鄉鎮市區的map
      *
      */
-    Map<String, List<String>> cityData = new HashMap<String, List<String>>() {{
+    Map<String, List<String>> cityData = new LinkedHashMap<String, List<String>>() {{
         put("新北市", Arrays.asList(
                 "板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區",
                 "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "深坑區",

@@ -179,9 +179,6 @@ public class MainActivity extends AppCompatActivity {
                     recyclerViewWeather.setAdapter(adapterFutureWeather);
                 }
             });
-            Log.d("DATA:", String.valueOf(DateTimeUtils.compareDateTime(DateTimeUtils.getNowTime(),
-                    DateTimeUtils.convertStringToDate("2023-01-01 02:02:32"))));
-            Log.d("DATA:", weatherFutureModel.getMaxMinRealTempByDate(DateTimeUtils.convertStringToDate("2023-01-10 02:02:32"))[0]);
         }
     };
 
