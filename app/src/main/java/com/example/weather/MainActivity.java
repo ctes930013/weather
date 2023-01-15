@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewWeather = findViewById(R.id.recycler_view_weather);
         recyclerViewWeatherHour.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerViewWeather.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewWeather.setNestedScrollingEnabled(true);
         sharedPrefUtils = new SharedPrefUtils(this);
 
         //根據時段選擇背景顏色
