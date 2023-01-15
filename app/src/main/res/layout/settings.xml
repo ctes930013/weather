@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/main_title"
+        layout="@layout/main_title"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_settings"
@@ -10,4 +15,4 @@
         android:layout_margin="10dp"
         android:overScrollMode="never"
         android:scrollbars="none" />
-</RelativeLayout>
+</LinearLayout>

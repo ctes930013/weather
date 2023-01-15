@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weather.BaseActivity;
 import com.example.weather.R;
 import com.example.weather.adapter.AdapterSettings;
 import com.example.weather.utils.OnItemClickListener;
@@ -18,17 +19,23 @@ import java.util.List;
  * 設定頁面
  *
  */
-public class Settings extends AppCompatActivity {
+public class Settings extends BaseActivity {
 
     private RecyclerView recyclerViewSettings;
     private AdapterSettings adapterSettings;
     private List<String> settingsArr = new ArrayList<>();
     @Override
+    protected int getContentId() {
+        return R.layout.settings;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings);
         recyclerViewSettings = findViewById(R.id.recycler_view_settings);
         recyclerViewSettings.setLayoutManager(new LinearLayoutManager(this));
+
+        setTitle("設定");
 
         settingsArr.add("位置選擇");
         settingsArr.add("地區選擇");
