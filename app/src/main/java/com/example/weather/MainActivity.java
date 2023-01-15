@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +26,7 @@ import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
+import com.example.weather.page.Settings;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
     private LinearLayout linMain;
-    private ImageView imgCurrentWeather;
+    private ImageView imgCurrentWeather, imgSetting;
     private TextView txtTown, txtCurrentTemp, txtCurrentDesc, txtCurrentTempRange;
     private RecyclerView recyclerViewWeatherHour, recyclerViewWeather;
     private AdapterHourWeather adapterHourWeather;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         linMain = findViewById(R.id.lin_main);
         imgCurrentWeather = findViewById(R.id.img_current_weather);
+        imgSetting = findViewById(R.id.img_setting);
         txtTown = findViewById(R.id.txt_town);
         txtCurrentTemp = findViewById(R.id.txt_current_temp);
         txtCurrentDesc = findViewById(R.id.txt_current_desc);
@@ -75,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.ACCESS_FINE_LOCATION
             }, 100);
         }
+
+        //跳轉設定頁面
+        imgSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, Settings.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

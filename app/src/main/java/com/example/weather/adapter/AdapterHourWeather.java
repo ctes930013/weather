@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weather.R;
@@ -32,9 +33,6 @@ public class AdapterHourWeather extends RecyclerView.Adapter<AdapterHourWeather.
 
     public AdapterHourWeather(WeatherFutureModel weatherFutureModel) {
         this.weatherFutureModel = weatherFutureModel;
-        this.tempArr = new ArrayList<>();
-        this.rainProbArr = new ArrayList<>();
-        this.phenomenonArr = new ArrayList<>();
         tempArr = weatherFutureModel.getTempList(predictCount);
         rainProbArr = weatherFutureModel.getRainProbList(predictCount);
         phenomenonArr = weatherFutureModel.getPhenomenonList(predictCount);
@@ -55,6 +53,7 @@ public class AdapterHourWeather extends RecyclerView.Adapter<AdapterHourWeather.
         }
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
