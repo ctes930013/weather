@@ -76,16 +76,31 @@
                 android:textStyle="bold"
                 android:text="--" />
 
-            <TextView
-                android:id="@+id/txt_current_temp_range"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:text="--" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="Real Feel:" />
+
+                <TextView
+                    android:id="@+id/txt_current_temp_range"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="--" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

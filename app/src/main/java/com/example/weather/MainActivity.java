@@ -143,10 +143,8 @@ public class MainActivity extends AppCompatActivity {
                             WeatherImg.getImgByWeather(Integer.parseInt(weatherFutureModel.getNowPhenomenon()[1])));
                     txtCurrentTemp.setText(weatherFutureModel.getNowTemp() + "°C");
                     txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
-                    //取得當日天氣最高最低溫
-                    String maxTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[0];
-                    String minTemp = weatherFutureModel.getMaxMinTempByDate(DateTimeUtils.getNowTime())[1];
-                    txtCurrentTempRange.setText(maxTemp + "°C/" + minTemp + "°C");
+                    //取得當日體感溫度
+                    txtCurrentTempRange.setText(weatherFutureModel.getNowRealTemp() + "°C");
 
                     //取得未來幾天天氣預報
                     adapterFutureWeather = new AdapterFutureWeather(weatherFutureModel);

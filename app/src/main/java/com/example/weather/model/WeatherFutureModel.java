@@ -318,6 +318,19 @@ public class WeatherFutureModel {
     }
 
     /**
+     * 獲取當前的體感溫度
+     *
+     * @return String  溫度
+     *
+     */
+    public String getNowRealTemp() {
+        //直接將最高體感溫度和最低體感溫度取平均
+        int temp = (Integer.parseInt(getMaxRealTempList().get(0).getElementValue().get(0).getValue())
+                + Integer.parseInt(getMinRealTempList().get(0).getElementValue().get(0).getValue())) / 2;
+        return String.valueOf(temp);
+    }
+
+    /**
      * 獲取當前的天氣現象概況
      *
      * @return array  ["陰短暫雨", "11"]
