@@ -25,6 +25,7 @@ import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
+import com.example.weather.page.Settings;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
@@ -102,9 +103,8 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                //強制將當前所在地區設定為預設地區
-                cityModel.setMyCountry(Constants.defaultCounty);
-                cityModel.setMyCity(Constants.defaultCity);
+                //手動設定區域
+                setLocalRegion();
                 //呼叫中央氣象局的api
                 WeatherApi weatherApi = new WeatherApi(this);
                 weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
@@ -117,14 +117,21 @@ public class MainActivity extends AppCompatActivity {
         if (location != null){
             //成功取得
             //根據經緯度設定當前所在地區
-            cityModel.setMyCountry(GeocoderMgr.getCountyName(this, location.getLatitude(), location.getLongitude()));
-            cityModel.setMyCity(GeocoderMgr.getTownName(this, location.getLatitude(), location.getLongitude()));
+            //先判斷當前設定是否為GPS模式
+            if(sharedPrefUtils.getRegionMode() == 1){
+                //是
+                cityModel.setMyCountry(GeocoderMgr.getCountyName(this, location.getLatitude(), location.getLongitude()));
+                cityModel.setMyCity(GeocoderMgr.getTownName(this, location.getLatitude(), location.getLongitude()));
+            }else{
+                //否
+                setLocalRegion();
+            }
         }else{
             //取得失敗
-            Toast.makeText(this, "獲取定位失敗", Toast.LENGTH_SHORT).show();
-            //強制將當前所在地區設定為預設地區
-            cityModel.setMyCountry(Constants.defaultCounty);
-            cityModel.setMyCity(Constants.defaultCity);
+            if(sharedPrefUtils.getRegionMode() == 1)
+                Toast.makeText(this, "獲取定位失敗", Toast.LENGTH_SHORT).show();
+            //手動設定區域
+            setLocalRegion();
         }
 
         txtTown.setText(cityModel.getMyCountry()+cityModel.getMyCity());
@@ -206,5 +213,19 @@ public class MainActivity extends AppCompatActivity {
                 .navigationBarDarkIcon(sharedPrefUtils.getLastMode() == 0)
                 .navigationBarColor(bgColor)
                 .init();
+    }
+
+    //判斷先前是否有手動設定區域來取得地區
+    private void setLocalRegion(){
+        if("".equals(sharedPrefUtils.getRegionCounty()) || "".equals(sharedPrefUtils.getRegionCity())){
+            //沒有
+            //強制將當前所在地區設定為預設地區
+            cityModel.setMyCountry(Constants.defaultCounty);
+            cityModel.setMyCity(Constants.defaultCity);
+        }else{
+            //有
+            cityModel.setMyCountry(sharedPrefUtils.getRegionCounty());
+            cityModel.setMyCity(sharedPrefUtils.getRegionCity());
+        }
     }
 }

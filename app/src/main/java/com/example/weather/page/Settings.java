@@ -3,6 +3,7 @@ package com.example.weather.page;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,8 +57,7 @@ public class Settings extends BaseActivity {
                         showRegionModeDialog();
                         break;
                     case 1:
-                        Route route = new Route(Settings.this);
-                        route.toSetCounty();
+                        toSetCounty();
                         break;
                     default:
                         break;
@@ -67,6 +67,7 @@ public class Settings extends BaseActivity {
     }
 
     //顯示位置選擇彈窗
+    AlertDialog alert;
     private void showRegionModeDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("位置選擇");
@@ -77,23 +78,42 @@ public class Settings extends BaseActivity {
         alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Route route = new Route(Settings.this);
                 switch (which) {
                     case 0:
+                        alert.dismiss();
                         //設定偏好為GPS定位
                         sharedPrefUtils.setRegionMode(1);
                         //回首頁
-                        Route route = new Route(Settings.this);
                         route.toIndex();
                         break;
                     case 1:
+                        alert.dismiss();
+                        if("".equals(sharedPrefUtils.getRegionCounty()) || "".equals(sharedPrefUtils.getRegionCity())){
+                            //代表還沒設定過地區
+                            Toast.makeText(Settings.this, "當前尚未設定過區域，請先設定區域", Toast.LENGTH_SHORT).show();
+                            toSetCounty();
+                        }else{
+                            //代表已經設定過地區
+                            //設定偏好為手動選取地區
+                            sharedPrefUtils.setRegionMode(2);
+                            //回首頁
+                            route.toIndex();
+                        }
                         break;
                     default:
                         break;
                 }
             }
         });
-        AlertDialog alert = alertDialog.create();
+        alert = alertDialog.create();
         alert.setCanceledOnTouchOutside(false);
         alert.show();
+    }
+
+    //跳轉至選擇縣市頁面
+    private void toSetCounty(){
+        Route route = new Route(Settings.this);
+        route.toSetCounty();
     }
 }
