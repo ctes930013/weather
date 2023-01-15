@@ -15,4 +15,5 @@
 
     <color name="light_bg">#4CABF6</color>
     <color name="night_bg">#1B405A</color>
+    <color name="white_20">#33FFFFFF</color>
 </resources>

@@ -104,7 +104,17 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 未來天氣資預報 -->
+    <!-- 未來幾小時天氣預報資料 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_weather_hour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+
+    <!-- 未來幾天天氣預報資料 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_weather"
         android:layout_width="match_parent"

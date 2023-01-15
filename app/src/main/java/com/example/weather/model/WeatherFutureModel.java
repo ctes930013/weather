@@ -7,6 +7,7 @@ import com.example.weather.data.WeatherElement;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -369,6 +370,56 @@ public class WeatherFutureModel {
      */
     public String getNowRainProb() {
         return getRainProb6List().get(0).getElementValue().get(0).getValue();
+    }
+
+    /**
+     * 獲取某幾筆最近的溫度
+     *
+     * @param count  資料比數
+     * @return List<Map<String, String>>  溫度陣列
+     *
+     */
+    public List<Map<String, String>> getTempList(int count) {
+        List<Map<String, String>> tempList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put("start_time", getRealTempList().get(i).getStartTime());
+            map.put("end_time", getRealTempList().get(i).getEndTime());
+            map.put("temp", getRealTempList().get(i).getElementValue().get(0).getValue());
+            tempList.add(map);
+        }
+        return tempList;
+    }
+
+    /**
+     * 獲取某幾筆最近的天氣現象概況
+     *
+     * @param count  資料比數
+     * @return List<String []>  ["陰短暫雨", "11"]
+     *
+     */
+    public List<String []> getPhenomenonList(int count) {
+        List<String []> phenomenonList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            phenomenonList.add(new String[]{getPhenomenonList().get(0).getElementValue().get(0).getValue(),
+                    getPhenomenonList().get(0).getElementValue().get(1).getValue()});
+        }
+        return phenomenonList;
+    }
+
+    /**
+     * 獲取某幾筆最近的降雨機率
+     *
+     * @param count  資料比數
+     * @return List<String>  溫度陣列
+     *
+     */
+    public List<String> getRainProbList(int count) {
+        List<String> rainList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            rainList.add(getRainProb12List().get(i).getElementValue().get(0).getValue());
+        }
+        return rainList;
     }
 
     /**

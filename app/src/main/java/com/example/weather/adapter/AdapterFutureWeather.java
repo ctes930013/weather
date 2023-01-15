@@ -1,6 +1,5 @@
 package com.example.weather.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weather.R;
-import com.example.weather.data.WeatherElement;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.WeatherImg;
@@ -18,8 +16,11 @@ import com.example.weather.utils.WeatherImg;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * 未來幾天天氣預報佈局
+ *
+ */
 public class AdapterFutureWeather extends RecyclerView.Adapter<AdapterFutureWeather.ViewHolder> {
 
     private WeatherFutureModel weatherFutureModel;

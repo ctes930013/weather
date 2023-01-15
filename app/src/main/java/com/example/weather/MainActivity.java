@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.weather.adapter.AdapterFutureWeather;
+import com.example.weather.adapter.AdapterHourWeather;
 import com.example.weather.api.WeatherApi;
 import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linMain;
     private ImageView imgCurrentWeather;
     private TextView txtTown, txtCurrentTemp, txtCurrentDesc, txtCurrentTempRange;
-    private RecyclerView recyclerViewWeather;
+    private RecyclerView recyclerViewWeatherHour, recyclerViewWeather;
+    private AdapterHourWeather adapterHourWeather;
     private AdapterFutureWeather adapterFutureWeather;
 
     @Override
@@ -51,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
         txtCurrentTemp = findViewById(R.id.txt_current_temp);
         txtCurrentDesc = findViewById(R.id.txt_current_desc);
         txtCurrentTempRange = findViewById(R.id.txt_current_temp_range);
+        recyclerViewWeatherHour = findViewById(R.id.recycler_view_weather_hour);
         recyclerViewWeather = findViewById(R.id.recycler_view_weather);
+        recyclerViewWeatherHour.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerViewWeather.setLayoutManager(new LinearLayoutManager(this));
         sharedPrefUtils = new SharedPrefUtils(this);
 
@@ -145,6 +149,10 @@ public class MainActivity extends AppCompatActivity {
                     txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
                     //取得當日體感溫度
                     txtCurrentTempRange.setText(weatherFutureModel.getNowRealTemp() + "°C");
+
+                    //取得未來幾小時天氣預報
+                    adapterHourWeather = new AdapterHourWeather(weatherFutureModel);
+                    recyclerViewWeatherHour.setAdapter(adapterHourWeather);
 
                     //取得未來幾天天氣預報
                     adapterFutureWeather = new AdapterFutureWeather(weatherFutureModel);
