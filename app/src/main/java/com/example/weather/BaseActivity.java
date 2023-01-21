@@ -13,13 +13,14 @@ import com.gyf.immersionbar.ImmersionBar;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private ImageView imgBack;
-    private TextView txtTitle;
+    protected TextView txtTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getContentId());
         imgBack = findViewById(R.id.img_back);
         txtTitle = findViewById(R.id.txt_title);
+        setPageTitle(getPageTitle());
 
         //設定狀態欄顏色
         ImmersionBar.with(this)
@@ -43,8 +44,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     @LayoutRes
     protected abstract int getContentId();
 
-    //設定標題
-    protected void setTitle(String title) {
+    //取得頁面標題
+    protected abstract String getPageTitle();
+
+    //設定頁面標題
+    protected void setPageTitle(String title){
         txtTitle.setText(title);
     }
 }

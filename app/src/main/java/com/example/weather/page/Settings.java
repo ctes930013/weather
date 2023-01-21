@@ -36,13 +36,16 @@ public class Settings extends BaseActivity {
     }
 
     @Override
+    protected String getPageTitle() {
+        return "設定";
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerViewSettings = findViewById(R.id.recycler_view_settings);
         recyclerViewSettings.setLayoutManager(new LinearLayoutManager(this));
         sharedPrefUtils = new SharedPrefUtils(this);
-
-        setTitle("設定");
 
         settingsArr.add("位置選擇");
         settingsArr.add("地區選擇");

@@ -31,13 +31,16 @@ public class SetCounty extends BaseActivity {
     }
 
     @Override
+    protected String getPageTitle() {
+        return "縣市設定";
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerViewSetCounty = findViewById(R.id.recycler_view_set_county);
         recyclerViewSetCounty.setLayoutManager(new LinearLayoutManager(this));
         cityModel = new CityModel();
-
-        setTitle("縣市設定");
 
         countyArr = cityModel.getAllCounty();
 

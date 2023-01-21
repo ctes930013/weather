@@ -34,6 +34,11 @@ public class SetCity extends BaseActivity {
     }
 
     @Override
+    protected String getPageTitle() {
+        return county;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerViewSetCity = findViewById(R.id.recycler_view_set_city);
@@ -43,7 +48,7 @@ public class SetCity extends BaseActivity {
 
         county = getIntent().getExtras().getString("county");
 
-        setTitle(county);
+        setPageTitle(getPageTitle());
 
         cityArr = cityModel.getAllCityByCounty(county);
 
