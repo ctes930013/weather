@@ -1,5 +1,8 @@
 package com.example.weather.service;
 
+import static java.util.Collections.singleton;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -19,10 +22,15 @@ import androidx.annotation.Nullable;
 
 import com.example.weather.R;
 import com.example.weather.app_widget.MyWeatherWidget;
+import com.intentfilter.androidpermissions.PermissionManager;
+import com.intentfilter.androidpermissions.models.DeniedPermissions;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class WeatherService extends Service implements Runnable {
@@ -78,6 +86,7 @@ public class WeatherService extends Service implements Runnable {
     @Override
     public void onCreate() {
         super.onCreate();
+        checkPermission();
         Log.d(TAG, "onCreate:(Service) ");
         handler.sendEmptyMessage(1);
         handler.post(this);
@@ -117,5 +126,25 @@ public class WeatherService extends Service implements Runnable {
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, myIntent, 0);
         remoteViews.setOnClickPendingIntent(R.id.img_update, pendingIntent);
         manager.updateAppWidget(thisWidget, remoteViews);
+    }
+
+    /**檢查權限*/
+    private void checkPermission(){
+        Set<String> permissionSet = new HashSet<>();
+        permissionSet.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionSet.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        PermissionManager permissionManager = PermissionManager.getInstance(getApplicationContext());
+        permissionManager.checkPermissions(permissionSet, new PermissionManager.PermissionRequestListener() {
+            @Override
+            public void onPermissionGranted() {
+                Log.d("fuck", "Permissions Granted");
+            }
+
+            @Override
+            public void onPermissionDenied(DeniedPermissions deniedPermissions) {
+                String deniedPermissionsText = "Denied: " + Arrays.toString(deniedPermissions.toArray());
+                Log.d("fuck", deniedPermissionsText);
+            }
+        });
     }
 }
