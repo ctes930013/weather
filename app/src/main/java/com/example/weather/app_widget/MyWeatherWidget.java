@@ -25,7 +25,7 @@ public class MyWeatherWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         Boolean isRun = isServiceRun(context);
-        Log.d(TAG, "onUpdate: 有Service再跑？: " + isRun);
+        Log.d(TAG, "onUpdate: Service狀態: " + isRun);
         if (!isRun) startRunService(context);
     }
 

@@ -30,6 +30,7 @@ import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
+import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.WeatherImg;
 import com.intentfilter.androidpermissions.PermissionManager;
 import com.intentfilter.androidpermissions.models.DeniedPermissions;
@@ -37,45 +38,74 @@ import com.intentfilter.androidpermissions.models.DeniedPermissions;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
-public class WeatherService extends Service implements Runnable {
+public class WeatherService extends Service {
     public static final String TAG = MyWeatherWidget.TAG;
     //用於識別是來自於更新按鈕點擊事件的標籤
     public static final String UPDATE_EVENT = "onUpdate";
-    @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.TAIWAN);
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
+    //時間的handler的唯一值tag
+    private final int dateHandlerFlag = 1;
+    //天氣的handler的唯一值tag
+    private final int weatherHandlerFlag = 2;
 
+    /**時間的handler*/
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private final Handler dateHandler = new Handler(){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 1){
+            if (msg.what == dateHandlerFlag){
                 update();
             }
         }
     };
 
-    @Override
-    public void run() {
-        //設置flag
-        handler.sendEmptyMessage(1);
-        //每秒更新一次
-        handler.postDelayed(this,1000);
-    }
+    /**天氣api的handler*/
+    @SuppressLint("HandlerLeak")
+    private final Handler weatherHandler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == weatherHandlerFlag){
+                //檢查權限同時呼叫天氣api
+                checkPermission();
+            }
+        }
+    };
+
+    /**時間的run*/
+    Runnable dateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            //設置flag
+            dateHandler.sendEmptyMessage(dateHandlerFlag);
+            //每秒更新一次
+            dateHandler.postDelayed(this,1000);
+        }
+    };
+
+    /**天氣api的run*/
+    Runnable weatherRunnable = new Runnable() {
+        @Override
+        public void run() {
+            //設置flag
+            weatherHandler.sendEmptyMessage(weatherHandlerFlag);
+            //每半小時更新一次
+            weatherHandler.postDelayed(this,1800000);
+        }
+    };
 
     /**更新時間*/
     private void update(){
-        Calendar c = Calendar.getInstance();
-        //設定東八區
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
-        String time = sdf.format(c.getTime());
+        Date date = DateTimeUtils.getNowTime();
+        String time = DateTimeUtils.convertDistinctFormat("yyyy-MM-dd HH:mm:ss", date);
         //取得天氣頁面的元件
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
         views.setTextViewText(R.id.txt_time, time);
@@ -99,11 +129,13 @@ public class WeatherService extends Service implements Runnable {
         super.onCreate();
         cityModel = new CityModel(getApplicationContext());
         weatherFutureModel = new WeatherFutureModel();
-        //檢查權限同時呼叫天氣api
-        checkPermission();
         Log.d(TAG, "onCreate:(Service) ");
-        handler.sendEmptyMessage(1);
-        handler.post(this);
+
+        dateHandler.sendEmptyMessage(dateHandlerFlag);
+        dateHandler.post(dateRunnable);
+
+        weatherHandler.sendEmptyMessage(weatherHandlerFlag);
+        weatherHandler.post(weatherRunnable);
     }
 
     /**當服務被開啟時*/
@@ -171,7 +203,7 @@ public class WeatherService extends Service implements Runnable {
         });
     }
 
-    //取得天氣api的回傳值
+    /**取得天氣api的回傳值*/
     private final APICallback<WeatherData> weatherCallback = new APICallback<WeatherData>() {
 
         @Override
