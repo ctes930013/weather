@@ -47,7 +47,7 @@ public class WeatherService extends Service implements Runnable {
     //用於識別是來自於更新按鈕點擊事件的標籤
     public static final String UPDATE_EVENT = "onUpdate";
     @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.TAIWAN);
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.TAIWAN);
     private CityModel cityModel;
     private WeatherFutureModel weatherFutureModel;
 
@@ -190,7 +190,22 @@ public class WeatherService extends Service implements Runnable {
             weatherFutureModel.setWeatherElements(cityModel.getMyCity());
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 public void run() {
-                    Log.d("DATA:", weatherFutureModel.getNowTemp() + "°C");
+                    //取得當日溫度
+                    //取得天氣頁面的元件
+                    RemoteViews views = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
+                    views.setTextViewText(R.id.txt_town, cityModel.getMyCountry()+cityModel.getMyCity());
+                    views.setImageViewResource(R.id.img_current_weather,
+                            WeatherImg.getImgByWeather(Integer.parseInt(weatherFutureModel.getNowPhenomenon()[1])));
+                    views.setTextViewText(R.id.txt_current_desc, weatherFutureModel.getNowPhenomenon()[0]);
+                    views.setTextViewText(R.id.txt_current_temp, weatherFutureModel.getNowTemp() + "°C");
+                    views.setTextViewText(R.id.txt_current_rain, weatherFutureModel.getNowRainProb() + "%");
+                    views.setTextViewText(R.id.txt_current_detail, weatherFutureModel.getNowDesc());
+
+                    //將天氣的類別與天氣頁面做綁定更新
+                    AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
+                    ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
+                    //通知AppWidget的onUpdate
+                    manager.updateAppWidget(componentName, views);
                 }
             });
         }
