@@ -44,7 +44,7 @@ public class SetCity extends BaseActivity {
         recyclerViewSetCity = findViewById(R.id.recycler_view_set_city);
         recyclerViewSetCity.setLayoutManager(new LinearLayoutManager(this));
         sharedPrefUtils = new SharedPrefUtils(this);
-        cityModel = new CityModel();
+        cityModel = new CityModel(this);
 
         county = getIntent().getExtras().getString("county");
 

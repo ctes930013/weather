@@ -1,7 +1,12 @@
 package com.example.weather.model;
 
-import com.example.weather.data.Location;
+import android.content.Context;
+import android.location.Location;
+import android.widget.Toast;
+
 import com.example.weather.utils.Constants;
+import com.example.weather.utils.GeocoderMgr;
+import com.example.weather.utils.SharedPrefUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +20,12 @@ import java.util.Map;
  *
  */
 public class CityModel {
+
+    Context context;
+
+    public CityModel(Context context){
+        this.context = context;
+    }
 
     /**
      * 使用者當前設定的縣市
@@ -292,5 +303,52 @@ public class CityModel {
             return getCodeByCounty(Constants.defaultCounty);
         }
         return code;
+    }
+
+    /**
+     * 判斷先前是否有手動設定區域來取得地區
+     *
+     */
+    public void setLocalRegion(){
+        SharedPrefUtils sharedPrefUtils = new SharedPrefUtils(context);
+        if("".equals(sharedPrefUtils.getRegionCounty()) || "".equals(sharedPrefUtils.getRegionCity())){
+            //沒有
+            //強制將當前所在地區設定為預設地區
+            setMyCountry(Constants.defaultCounty);
+            setMyCity(Constants.defaultCity);
+        }else{
+            //有
+            setMyCountry(sharedPrefUtils.getRegionCounty());
+            setMyCity(sharedPrefUtils.getRegionCity());
+        }
+    }
+
+    /**
+     * 藉由GPS定位獲得位置
+     *
+     */
+    public void setLocationByGPS(){
+        SharedPrefUtils sharedPrefUtils = new SharedPrefUtils(context);
+        //取得經緯度
+        Location location = GeocoderMgr.getLocation(context);
+        if (location != null){
+            //成功取得
+            //根據經緯度設定當前所在地區
+            //先判斷當前設定是否為GPS模式
+            if(sharedPrefUtils.getRegionMode() == 1){
+                //是
+                setMyCountry(GeocoderMgr.getCountyName(context, location.getLatitude(), location.getLongitude()));
+                setMyCity(GeocoderMgr.getTownName(context, location.getLatitude(), location.getLongitude()));
+            }else{
+                //否
+                setLocalRegion();
+            }
+        }else{
+            //取得失敗
+            if(sharedPrefUtils.getRegionMode() == 1)
+                Toast.makeText(context, "獲取定位失敗", Toast.LENGTH_SHORT).show();
+            //手動設定區域
+            setLocalRegion();
+        }
     }
 }

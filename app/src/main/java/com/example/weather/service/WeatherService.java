@@ -20,8 +20,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.weather.MainActivity;
 import com.example.weather.R;
+import com.example.weather.adapter.AdapterFutureWeather;
+import com.example.weather.adapter.AdapterHourWeather;
+import com.example.weather.api.WeatherApi;
 import com.example.weather.app_widget.MyWeatherWidget;
+import com.example.weather.data.WeatherData;
+import com.example.weather.model.CityModel;
+import com.example.weather.model.WeatherFutureModel;
+import com.example.weather.network.APICallback;
+import com.example.weather.utils.WeatherImg;
 import com.intentfilter.androidpermissions.PermissionManager;
 import com.intentfilter.androidpermissions.models.DeniedPermissions;
 
@@ -39,6 +48,8 @@ public class WeatherService extends Service implements Runnable {
     public static final String UPDATE_EVENT = "onUpdate";
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.TAIWAN);
+    private CityModel cityModel;
+    private WeatherFutureModel weatherFutureModel;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
@@ -86,6 +97,9 @@ public class WeatherService extends Service implements Runnable {
     @Override
     public void onCreate() {
         super.onCreate();
+        cityModel = new CityModel(getApplicationContext());
+        weatherFutureModel = new WeatherFutureModel();
+        //檢查權限同時呼叫天氣api
         checkPermission();
         Log.d(TAG, "onCreate:(Service) ");
         handler.sendEmptyMessage(1);
@@ -137,14 +151,48 @@ public class WeatherService extends Service implements Runnable {
         permissionManager.checkPermissions(permissionSet, new PermissionManager.PermissionRequestListener() {
             @Override
             public void onPermissionGranted() {
-                Log.d("fuck", "Permissions Granted");
+                //取得定位權限成功
+                cityModel.setLocationByGPS();
+
+                //呼叫中央氣象局的api
+                WeatherApi weatherApi = new WeatherApi(getApplicationContext());
+                weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
             }
 
             @Override
             public void onPermissionDenied(DeniedPermissions deniedPermissions) {
-                String deniedPermissionsText = "Denied: " + Arrays.toString(deniedPermissions.toArray());
-                Log.d("fuck", deniedPermissionsText);
+                //取得定位權限失敗
+                //手動設定區域
+                cityModel.setLocalRegion();
+                //呼叫中央氣象局的api
+                WeatherApi weatherApi = new WeatherApi(getApplicationContext());
+                weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
             }
         });
     }
+
+    //取得天氣api的回傳值
+    private final APICallback<WeatherData> weatherCallback = new APICallback<WeatherData>() {
+
+        @Override
+        public void onFailure(int errorCode, String errorMessage) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(WeatherData data) {
+            //設定該地區的天氣資訊
+            weatherFutureModel.setLocation(data.getWeatherRecord().getLocations().get(0).getLocation());
+            weatherFutureModel.setWeatherElements(cityModel.getMyCity());
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    Log.d("DATA:", weatherFutureModel.getNowTemp() + "°C");
+                }
+            });
+        }
+    };
 }

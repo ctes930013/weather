@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         getCurrentMode();
 
 
-        cityModel = new CityModel();
+        cityModel = new CityModel(this);
         weatherFutureModel = new WeatherFutureModel();
 
         //權限檢查
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 //手動設定區域
-                setLocalRegion();
+                cityModel.setLocalRegion();
                 //呼叫中央氣象局的api
                 WeatherApi weatherApi = new WeatherApi(this);
                 weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
@@ -112,27 +112,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        //取得經緯度
-        Location location = GeocoderMgr.getLocation(this);
-        if (location != null){
-            //成功取得
-            //根據經緯度設定當前所在地區
-            //先判斷當前設定是否為GPS模式
-            if(sharedPrefUtils.getRegionMode() == 1){
-                //是
-                cityModel.setMyCountry(GeocoderMgr.getCountyName(this, location.getLatitude(), location.getLongitude()));
-                cityModel.setMyCity(GeocoderMgr.getTownName(this, location.getLatitude(), location.getLongitude()));
-            }else{
-                //否
-                setLocalRegion();
-            }
-        }else{
-            //取得失敗
-            if(sharedPrefUtils.getRegionMode() == 1)
-                Toast.makeText(this, "獲取定位失敗", Toast.LENGTH_SHORT).show();
-            //手動設定區域
-            setLocalRegion();
-        }
+        cityModel.setLocationByGPS();
 
         txtTown.setText(cityModel.getMyCountry()+cityModel.getMyCity());
 
@@ -210,19 +190,5 @@ public class MainActivity extends AppCompatActivity {
                 .navigationBarDarkIcon(sharedPrefUtils.getLastMode() == 0)
                 .navigationBarColor(bgColor)
                 .init();
-    }
-
-    //判斷先前是否有手動設定區域來取得地區
-    private void setLocalRegion(){
-        if("".equals(sharedPrefUtils.getRegionCounty()) || "".equals(sharedPrefUtils.getRegionCity())){
-            //沒有
-            //強制將當前所在地區設定為預設地區
-            cityModel.setMyCountry(Constants.defaultCounty);
-            cityModel.setMyCity(Constants.defaultCity);
-        }else{
-            //有
-            cityModel.setMyCountry(sharedPrefUtils.getRegionCounty());
-            cityModel.setMyCity(sharedPrefUtils.getRegionCity());
-        }
     }
 }

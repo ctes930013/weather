@@ -40,7 +40,7 @@ public class SetCounty extends BaseActivity {
         super.onCreate(savedInstanceState);
         recyclerViewSetCounty = findViewById(R.id.recycler_view_set_county);
         recyclerViewSetCounty.setLayoutManager(new LinearLayoutManager(this));
-        cityModel = new CityModel();
+        cityModel = new CityModel(this);
 
         countyArr = cityModel.getAllCounty();
 
