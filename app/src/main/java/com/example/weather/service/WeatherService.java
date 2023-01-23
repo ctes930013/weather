@@ -1,18 +1,22 @@
 package com.example.weather.service;
 
-import static java.util.Collections.singleton;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -52,8 +56,32 @@ public class WeatherService extends Service {
     private WeatherFutureModel weatherFutureModel;
     //時間的handler的唯一值tag
     private final int dateHandlerFlag = 1;
-    //天氣的handler的唯一值tag
-    private final int weatherHandlerFlag = 2;
+    //抓天氣api的時間間隔(ms)
+    private final int weatherTimeInterval = 600000;
+    //抓天氣api的定時器的tag
+    private final String ALARM_ACTION = "weather_alarm";
+    //抓天氣api的定時器
+    private AlarmManager weatherAlarmManager;
+    private PendingIntent weatherPendingIntent;
+
+    /**天氣api的廣播器*/
+    private final BroadcastReceiver weatherReceive = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //write your code here
+            //檢查權限同時呼叫天氣api
+            checkPermission();
+
+            //若版本高於6.0，需要重新設定定時器
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                weatherAlarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + weatherTimeInterval, weatherPendingIntent);
+            }else{
+                weatherAlarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + weatherTimeInterval, weatherPendingIntent);
+            }
+        }
+    };
 
     /**時間的handler*/
     @SuppressLint("HandlerLeak")
@@ -67,19 +95,6 @@ public class WeatherService extends Service {
         }
     };
 
-    /**天氣api的handler*/
-    @SuppressLint("HandlerLeak")
-    private final Handler weatherHandler = new Handler(){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == weatherHandlerFlag){
-                //檢查權限同時呼叫天氣api
-                checkPermission();
-            }
-        }
-    };
-
     /**時間的run*/
     Runnable dateRunnable = new Runnable() {
         @Override
@@ -88,17 +103,6 @@ public class WeatherService extends Service {
             dateHandler.sendEmptyMessage(dateHandlerFlag);
             //每秒更新一次
             dateHandler.postDelayed(this,1000);
-        }
-    };
-
-    /**天氣api的run*/
-    Runnable weatherRunnable = new Runnable() {
-        @Override
-        public void run() {
-            //設置flag
-            weatherHandler.sendEmptyMessage(weatherHandlerFlag);
-            //每半小時更新一次
-            weatherHandler.postDelayed(this,1800000);
         }
     };
 
@@ -134,8 +138,34 @@ public class WeatherService extends Service {
         dateHandler.sendEmptyMessage(dateHandlerFlag);
         dateHandler.post(dateRunnable);
 
-        weatherHandler.sendEmptyMessage(weatherHandlerFlag);
-        weatherHandler.post(weatherRunnable);
+        //設置抓天氣api的定時器
+        IntentFilter intentFilter = new IntentFilter(ALARM_ACTION);
+        registerReceiver(weatherReceive, intentFilter);
+
+        //綁定定時器執行的動作
+        weatherAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        weatherPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ALARM_ACTION), 0);
+
+        //若版本高於6.0，在省電模式時使用此發法才可以準時觸發定時任務
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            weatherAlarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime(), weatherPendingIntent);
+        }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            //若版本高於4.4，使用此發法可以比較準時
+            weatherAlarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime(), weatherPendingIntent);
+        }else{
+            weatherAlarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + weatherTimeInterval, weatherTimeInterval, weatherPendingIntent);
+        }
+    }
+
+    /**當服務被kill時*/
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(weatherReceive);
+        weatherAlarmManager.cancel(weatherPendingIntent);
     }
 
     /**當服務被開啟時*/
