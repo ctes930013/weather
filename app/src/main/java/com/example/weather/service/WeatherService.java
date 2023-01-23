@@ -177,13 +177,7 @@ public class WeatherService extends Service {
             //每次點擊按鈕時，intent就會送一個廣播出來
             if (intent.getAction().equals(UPDATE_EVENT)){
                 Log.d(TAG, "Click method ");
-                Handler toastHandler = new Handler(Looper.getMainLooper());
-                toastHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "點擊了小物件", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                checkPermission();
             }
         }
         setOnUpdateClick();
