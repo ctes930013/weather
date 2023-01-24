@@ -11,6 +11,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,6 +36,7 @@ import com.example.weather.data.WeatherData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
+import com.example.weather.utils.BitmapUtils;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.WeatherImg;
 import com.intentfilter.androidpermissions.PermissionManager;
@@ -130,10 +133,7 @@ public class WeatherService extends Service {
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
         views.setTextViewText(R.id.txt_time, time);
         //將天氣的類別與天氣頁面做綁定更新
-        AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
-        ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
-        //通知AppWidget的onUpdate
-        manager.updateAppWidget(componentName, views);
+        updateAppWidget(views);
     }
 
     @Nullable
@@ -181,6 +181,16 @@ public class WeatherService extends Service {
             if (intent.getAction().equals(UPDATE_EVENT)){
                 Log.d(TAG, "Click method ");
                 checkPermission();
+
+                Bitmap bitmap = BitmapFactory.decodeResource(
+                        getApplicationContext().getResources(), R.drawable.refresh);
+                RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
+                for (int i = 0; i < 37; i++) {
+                    remoteViews.setImageViewBitmap(R.id.img_update,
+                            BitmapUtils.rotateBitmap(bitmap, (i * 10) % 360));
+
+                    updateAppWidget(remoteViews);
+                }
             }
         }
         setOnUpdateClick();
@@ -291,13 +301,17 @@ public class WeatherService extends Service {
                     views.setTextViewText(R.id.txt_current_rain, weatherFutureModel.getNowRainProb() + "%");
                     views.setTextViewText(R.id.txt_current_detail, weatherFutureModel.getNowDesc());
 
-                    //將天氣的類別與天氣頁面做綁定更新
-                    AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
-                    ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
-                    //通知AppWidget的onUpdate
-                    manager.updateAppWidget(componentName, views);
+                    updateAppWidget(views);
                 }
             });
         }
     };
+
+    /**將某個頁面與桌面小元件做綁定更新*/
+    private void updateAppWidget(RemoteViews views){
+        AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
+        ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
+        //通知AppWidget的onUpdate
+        manager.updateAppWidget(componentName, views);
+    }
 }
