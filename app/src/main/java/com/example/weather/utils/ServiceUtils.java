@@ -3,6 +3,7 @@ package com.example.weather.utils;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 
 import com.example.weather.service.WeatherService;
@@ -27,6 +28,17 @@ public class ServiceUtils {
             context.startForegroundService(intent);
         }
         context.startService(intent);
+    }
+
+    /**
+     * 與某個Service作綁定
+     *
+     * @param intent  Service的intent
+     * @param c  欲綁定的類別(需實作ServiceConnection)
+     *
+     */
+    public static void bindService(Context context, Intent intent, ServiceConnection c) {
+        context.bindService(intent, c, Context.BIND_AUTO_CREATE);
     }
 
     /**

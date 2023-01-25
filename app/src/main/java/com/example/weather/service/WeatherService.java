@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -136,10 +137,13 @@ public class WeatherService extends Service {
         updateAppWidget(views);
     }
 
+    /**可以透過onBind呼叫服務裡面的method*/
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        //參考:https://blog.csdn.net/shanshan_1117/article/details/80239932
+        Log.d(TAG, "onBind:(Service) ");
+        return new WeatherBinderService();
     }
 
     /**生命週期 : onCreate() ➞ onStartCommand() ➞ onDestroy()
@@ -182,6 +186,7 @@ public class WeatherService extends Service {
                 Log.d(TAG, "Click method ");
                 checkPermission();
 
+                //作動畫
                 Bitmap bitmap = BitmapFactory.decodeResource(
                         getApplicationContext().getResources(), R.drawable.refresh);
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
@@ -313,5 +318,13 @@ public class WeatherService extends Service {
         ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
         //通知AppWidget的onUpdate
         manager.updateAppWidget(componentName, views);
+    }
+
+    /**實作天氣api的服務綁定的類別*/
+    private class WeatherBinderService extends Binder implements WeatherBinder {
+        @Override
+        public void getWeatherData() {
+            checkPermission();
+        }
     }
 }

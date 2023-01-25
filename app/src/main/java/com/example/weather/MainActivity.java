@@ -7,10 +7,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,10 +30,13 @@ import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
 import com.example.weather.page.Settings;
+import com.example.weather.service.WeatherBinder;
+import com.example.weather.service.WeatherService;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
 import com.example.weather.utils.Route;
+import com.example.weather.utils.ServiceUtils;
 import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
 import com.gyf.immersionbar.ImmersionBar;
@@ -93,6 +100,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        Boolean isRun = ServiceUtils.isServiceRun(MainActivity.this, WeatherService.class.getName());
+//        Intent intent = new Intent(MainActivity.this, WeatherService.class);
+//        if (!isRun) {
+//            //若當前服務沒有被啟用則啟用服務
+//            ServiceUtils.startRunService(MainActivity.this, intent);
+//        } else {
+//            //若當前服務有被啟用則直接綁定服務
+//            WeatherServiceConnect weatherServiceConnect = new WeatherServiceConnect();
+//            ServiceUtils.bindService(MainActivity.this, intent, weatherServiceConnect);
+//        }
         //取得當前所在的經緯度
         getLocal();
     }
@@ -190,5 +207,21 @@ public class MainActivity extends AppCompatActivity {
                 .navigationBarDarkIcon(sharedPrefUtils.getLastMode() == 0)
                 .navigationBarColor(bgColor)
                 .init();
+    }
+
+    //綁定的天氣類別
+    private class WeatherServiceConnect implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            //先轉型為WeatherBinder同時呼叫取得天氣資訊api
+            WeatherBinder weatherBinder = (WeatherBinder) iBinder;
+            weatherBinder.getWeatherData();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
     }
 }
