@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import com.example.weather.adapter.AdapterFutureWeather;
 import com.example.weather.adapter.AdapterHourWeather;
 import com.example.weather.api.WeatherApi;
+import com.example.weather.app_widget.MyWeatherWidget;
 import com.example.weather.data.WeatherData;
 import com.example.weather.data.WeatherEventData;
 import com.example.weather.model.CityModel;
@@ -173,6 +175,21 @@ public class MainActivity extends AppCompatActivity {
 
         //呼叫中央氣象局的api
         runService();
+        //檢查是否有更改過地區，有要通知桌面小工具
+        if(sharedPrefUtils.getIsChangeCity()){
+            notifyAppWidget();
+            sharedPrefUtils.setIsChangeCity(false);
+        }
+    }
+
+    //通知桌面小工具更新資料
+    private void notifyAppWidget(){
+        Intent intent = new Intent(this, MyWeatherWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int [] ids = AppWidgetManager.getInstance(
+                getApplication()).getAppWidgetIds(new ComponentName(getApplication(), MyWeatherWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
     }
 
     //啟用服務來呼叫天氣api

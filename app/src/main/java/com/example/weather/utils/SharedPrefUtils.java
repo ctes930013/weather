@@ -24,6 +24,8 @@ public class SharedPrefUtils {
     String regionCounty = "region_county";
     //紀錄天氣的鄉鎮市區
     String regionCity = "region_city";
+    //是否變更鄉鎮市區
+    String isChangeCity = "is_change_city";
 
     /**
      * 設定紀錄操作時段
@@ -111,5 +113,27 @@ public class SharedPrefUtils {
     public String getRegionCity(){
         SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
         return pref.getString(regionCity, "");
+    }
+
+    /**
+     * 設定是否變更鄉鎮市區
+     *
+     * @param change
+     */
+    public void setIsChangeCity(boolean change){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        pref.edit()
+                .putBoolean(isChangeCity, change)
+                .commit();
+    }
+
+    /**
+     * 取得是否變更鄉鎮市區
+     *
+     * @return boolean
+     */
+    public boolean getIsChangeCity(){
+        SharedPreferences pref = context.getSharedPreferences("test", MODE_PRIVATE);
+        return pref.getBoolean(isChangeCity, false);
     }
 }

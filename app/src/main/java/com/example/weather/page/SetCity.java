@@ -59,6 +59,7 @@ public class SetCity extends BaseActivity {
             public void onItemClick(int position) {
                 //將模式改為手動選擇區域
                 sharedPrefUtils.setRegionMode(2);
+                sharedPrefUtils.setIsChangeCity(true);
                 //設定縣市以及鄉鎮市區
                 sharedPrefUtils.setRegionCounty(county);
                 sharedPrefUtils.setRegionCity(cityArr.get(position));

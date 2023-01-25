@@ -87,6 +87,7 @@ public class Settings extends BaseActivity {
                         alert.dismiss();
                         //設定偏好為GPS定位
                         sharedPrefUtils.setRegionMode(1);
+                        sharedPrefUtils.setIsChangeCity(true);
                         //回首頁
                         route.toIndex();
                         break;
@@ -100,6 +101,7 @@ public class Settings extends BaseActivity {
                             //代表已經設定過地區
                             //設定偏好為手動選取地區
                             sharedPrefUtils.setRegionMode(2);
+                            sharedPrefUtils.setIsChangeCity(true);
                             //回首頁
                             route.toIndex();
                         }
