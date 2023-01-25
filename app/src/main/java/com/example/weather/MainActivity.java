@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         eventBus.unregister(this);
+        //暫時解決小工具無法更新問題
+        runService();
     }
 
     @Override
@@ -169,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
         txtTown.setText(cityModel.getMyCountry()+cityModel.getMyCity());
 
         //呼叫中央氣象局的api
+        runService();
+    }
+
+    //啟用服務來呼叫天氣api
+    private void runService(){
         //先檢查服務
         Boolean isRun = ServiceUtils.isServiceRun(MainActivity.this, WeatherService.class.getName());
         Intent intent = new Intent(MainActivity.this, WeatherService.class);
