@@ -26,6 +26,7 @@ import com.example.weather.adapter.AdapterFutureWeather;
 import com.example.weather.adapter.AdapterHourWeather;
 import com.example.weather.api.WeatherApi;
 import com.example.weather.data.WeatherData;
+import com.example.weather.data.WeatherEventData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
@@ -41,6 +42,10 @@ import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
 import com.gyf.immersionbar.ImmersionBar;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 public class MainActivity extends AppCompatActivity {
 
     private SharedPrefUtils sharedPrefUtils;
@@ -52,11 +57,14 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerViewWeatherHour, recyclerViewWeather;
     private AdapterHourWeather adapterHourWeather;
     private AdapterFutureWeather adapterFutureWeather;
+    private EventBus eventBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        eventBus = EventBus.getDefault();
+        eventBus.register(this);
         linMain = findViewById(R.id.lin_main);
         imgCurrentWeather = findViewById(R.id.img_current_weather);
         imgSetting = findViewById(R.id.img_setting);
@@ -98,86 +106,83 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        eventBus.unregister(this);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        Boolean isRun = ServiceUtils.isServiceRun(MainActivity.this, WeatherService.class.getName());
-//        Intent intent = new Intent(MainActivity.this, WeatherService.class);
-//        if (!isRun) {
-//            //若當前服務沒有被啟用則啟用服務
-//            ServiceUtils.startRunService(MainActivity.this, intent);
-//        } else {
-//            //若當前服務有被啟用則直接綁定服務
-//            WeatherServiceConnect weatherServiceConnect = new WeatherServiceConnect();
-//            ServiceUtils.bindService(MainActivity.this, intent, weatherServiceConnect);
-//        }
         //取得當前所在的經緯度
         getLocal();
     }
 
+    //接收天氣api回傳回來的資料
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(WeatherEventData eventData) {
+        if(eventData.getCode() == 1){
+            //成功
+            //設定該地區的天氣資訊
+            WeatherData data = eventData.getWeatherData();
+            weatherFutureModel.setLocation(data.getWeatherRecord().getLocations().get(0).getLocation());
+            weatherFutureModel.setWeatherElements(cityModel.getMyCity());
+            //取得當日溫度
+            imgCurrentWeather.setImageResource(
+                    WeatherImg.getImgByWeather(Integer.parseInt(weatherFutureModel.getNowPhenomenon()[1])));
+            txtCurrentTemp.setText(weatherFutureModel.getNowTemp() + "°C");
+            txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
+            //取得當日體感溫度
+            txtCurrentTempRange.setText(weatherFutureModel.getNowRealTemp() + "°C");
+
+            //取得未來幾小時天氣預報
+            adapterHourWeather = new AdapterHourWeather(weatherFutureModel);
+            recyclerViewWeatherHour.setAdapter(adapterHourWeather);
+
+            //取得未來幾天天氣預報
+            adapterFutureWeather = new AdapterFutureWeather(weatherFutureModel);
+            recyclerViewWeather.setAdapter(adapterFutureWeather);
+        }else{
+            //失敗
+            Toast.makeText(MainActivity.this, "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     //取得當前所在位置
     private void getLocal() {
-        //沒有權限則返回
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                //沒有權限
                 //手動設定區域
                 cityModel.setLocalRegion();
-                //呼叫中央氣象局的api
-                WeatherApi weatherApi = new WeatherApi(this);
-                weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
-                return;
+            } else {
+                //自動根據定位設定區域
+                cityModel.setLocationByGPS();
             }
+        } else {
+            //自動根據定位設定區域
+            cityModel.setLocationByGPS();
         }
 
-        cityModel.setLocationByGPS();
 
         txtTown.setText(cityModel.getMyCountry()+cityModel.getMyCity());
 
         //呼叫中央氣象局的api
-        WeatherApi weatherApi = new WeatherApi(this);
-        weatherApi.callWeatherApi(weatherCallback, cityModel.getFutureCodeByCounty(cityModel.getMyCountry()));
+        //先檢查服務
+        Boolean isRun = ServiceUtils.isServiceRun(MainActivity.this, WeatherService.class.getName());
+        Intent intent = new Intent(MainActivity.this, WeatherService.class);
+        //打一個暗號表示桌面小工具被建立
+        intent.addCategory(Constants.MainAppCreate);
+        if (!isRun) {
+            //若當前服務沒有被啟用則啟用服務
+            ServiceUtils.startRunService(MainActivity.this, intent);
+        } else {
+            //若當前服務有被啟用則直接綁定服務
+            WeatherServiceConnect weatherServiceConnect = new WeatherServiceConnect();
+            ServiceUtils.bindService(MainActivity.this, intent, weatherServiceConnect);
+        }
     }
-
-    //取得天氣api的回傳值
-    private final APICallback<WeatherData> weatherCallback = new APICallback<WeatherData>() {
-
-        @Override
-        public void onFailure(int errorCode, String errorMessage) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(MainActivity.this, "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(WeatherData data) {
-            //設定該地區的天氣資訊
-            weatherFutureModel.setLocation(data.getWeatherRecord().getLocations().get(0).getLocation());
-            weatherFutureModel.setWeatherElements(cityModel.getMyCity());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //取得當日溫度
-                    imgCurrentWeather.setImageResource(
-                            WeatherImg.getImgByWeather(Integer.parseInt(weatherFutureModel.getNowPhenomenon()[1])));
-                    txtCurrentTemp.setText(weatherFutureModel.getNowTemp() + "°C");
-                    txtCurrentDesc.setText(weatherFutureModel.getNowPhenomenon()[0]);
-                    //取得當日體感溫度
-                    txtCurrentTempRange.setText(weatherFutureModel.getNowRealTemp() + "°C");
-
-                    //取得未來幾小時天氣預報
-                    adapterHourWeather = new AdapterHourWeather(weatherFutureModel);
-                    recyclerViewWeatherHour.setAdapter(adapterHourWeather);
-
-                    //取得未來幾天天氣預報
-                    adapterFutureWeather = new AdapterFutureWeather(weatherFutureModel);
-                    recyclerViewWeather.setAdapter(adapterFutureWeather);
-                }
-            });
-        }
-    };
 
     //設定當前模式
     private void setCurrentMode(){

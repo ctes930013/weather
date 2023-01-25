@@ -51,4 +51,7 @@ public class Constants {
 
     //最低體感溫度參數
     public static String MinAT = "MinAT";
+
+    //進入主程式的暗號
+    public static String MainAppCreate = "MainAppCreate";
 }

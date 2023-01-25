@@ -34,14 +34,18 @@ import com.example.weather.adapter.AdapterHourWeather;
 import com.example.weather.api.WeatherApi;
 import com.example.weather.app_widget.MyWeatherWidget;
 import com.example.weather.data.WeatherData;
+import com.example.weather.data.WeatherEventData;
 import com.example.weather.model.CityModel;
 import com.example.weather.model.WeatherFutureModel;
 import com.example.weather.network.APICallback;
 import com.example.weather.utils.BitmapUtils;
+import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.WeatherImg;
 import com.intentfilter.androidpermissions.PermissionManager;
 import com.intentfilter.androidpermissions.models.DeniedPermissions;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -155,16 +159,8 @@ public class WeatherService extends Service {
         weatherFutureModel = new WeatherFutureModel();
         Log.d(TAG, "onCreate:(Service) ");
 
-        dateHandler.sendEmptyMessage(dateHandlerFlag);
-        dateHandler.post(dateRunnable);
-
-        //偵測螢幕是否喚醒
-        IntentFilter filter = new IntentFilter(Intent.ACTION_USER_PRESENT);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(screenReceive, filter);
-
-        //啟用抓天氣api
-        startWeatherAlarm();
+        //檢查權限同時呼叫天氣api
+        checkPermission();
     }
 
     /**當服務被kill時*/
@@ -179,6 +175,21 @@ public class WeatherService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         Log.d(TAG, "onStart:(Service) " + intent.getAction());
+        Log.d(TAG, "onStart:(Service) " + intent.getCategories());
+        if (!intent.hasCategory(Constants.MainAppCreate)){
+            //倘若不是由主程式進入
+            //啟用定時
+            dateHandler.sendEmptyMessage(dateHandlerFlag);
+            dateHandler.post(dateRunnable);
+
+            //偵測螢幕是否喚醒
+            IntentFilter filter = new IntentFilter(Intent.ACTION_USER_PRESENT);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(screenReceive, filter);
+
+            //啟用抓天氣api
+            startWeatherAlarm();
+        }
         //監聽點擊事件
         if (intent.getAction() != null){
             //每次點擊按鈕時，intent就會送一個廣播出來
@@ -281,6 +292,12 @@ public class WeatherService extends Service {
 
         @Override
         public void onFailure(int errorCode, String errorMessage) {
+            //透過eventbus傳遞資料
+            EventBus mEventBus = EventBus.getDefault();;
+            WeatherEventData weatherEventData = new WeatherEventData();
+            weatherEventData.setCode(0);
+            weatherEventData.setErrorData(errorMessage);
+            mEventBus.post(weatherEventData);
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 public void run() {
                     Toast.makeText(getApplicationContext(), "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
@@ -290,6 +307,12 @@ public class WeatherService extends Service {
 
         @Override
         public void onSuccess(WeatherData data) {
+            //透過eventbus傳遞資料
+            EventBus mEventBus = EventBus.getDefault();;
+            WeatherEventData weatherEventData = new WeatherEventData();
+            weatherEventData.setCode(1);
+            weatherEventData.setWeatherData(data);
+            mEventBus.post(weatherEventData);
             //設定該地區的天氣資訊
             weatherFutureModel.setLocation(data.getWeatherRecord().getLocations().get(0).getLocation());
             weatherFutureModel.setWeatherElements(cityModel.getMyCity());
