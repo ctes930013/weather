@@ -237,6 +237,9 @@ public class WeatherService extends Service {
         //綁定定時器執行的動作
         weatherAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         weatherPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ALARM_ACTION), 0);
+        if(weatherPendingIntent != null){
+            weatherAlarmManager.cancel(weatherPendingIntent);
+        }
 
         //若版本高於6.0，在省電模式時使用此發法才可以準時觸發定時任務
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
