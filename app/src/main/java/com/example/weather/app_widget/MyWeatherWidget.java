@@ -1,19 +1,13 @@
 package com.example.weather.app_widget;
 
-import android.app.ActivityManager;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
-import android.widget.RemoteViews;
 
-import com.example.weather.R;
 import com.example.weather.service.WeatherService;
 import com.example.weather.utils.ServiceUtils;
-
-import java.util.List;
 
 /**
  * Implementation of App Widget functionality.
@@ -27,11 +21,12 @@ public class MyWeatherWidget extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         Boolean isRun = ServiceUtils.isServiceRun(context, WeatherService.class.getName());
         Log.d(TAG, "onUpdate: Service狀態: " + isRun);
-        if (!isRun) {
-            //若當前服務沒有被啟用則啟用服務
-            Intent intent = new Intent(context, WeatherService.class);
-            ServiceUtils.startRunService(context, intent);
+        Intent intent = new Intent(context, WeatherService.class);
+        if (isRun) {
+            //若當前服務有被啟用則先停用再啟用
+            ServiceUtils.stopService(context, intent);
         }
+        ServiceUtils.startRunService(context, intent);
     }
 
     /**接收廣播資訊*/

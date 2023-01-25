@@ -158,6 +158,9 @@ public class WeatherService extends Service {
         cityModel = new CityModel(getApplicationContext());
         weatherFutureModel = new WeatherFutureModel();
         Log.d(TAG, "onCreate:(Service) ");
+        //啟用定時
+        dateHandler.sendEmptyMessage(dateHandlerFlag);
+        dateHandler.post(dateRunnable);
 
         //檢查權限同時呼叫天氣api
         checkPermission();
@@ -167,8 +170,8 @@ public class WeatherService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(screenReceive);
-        cancelWeatherAlarm();
+        //unregisterReceiver(screenReceive);
+        //cancelWeatherAlarm();
     }
 
     /**當服務被開啟時*/
@@ -176,20 +179,17 @@ public class WeatherService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId){
         Log.d(TAG, "onStart:(Service) " + intent.getAction());
         Log.d(TAG, "onStart:(Service) " + intent.getCategories());
-        if (!intent.hasCategory(Constants.MainAppCreate)){
-            //倘若不是由主程式進入
-            //啟用定時
-            dateHandler.sendEmptyMessage(dateHandlerFlag);
-            dateHandler.post(dateRunnable);
-
-            //偵測螢幕是否喚醒
-            IntentFilter filter = new IntentFilter(Intent.ACTION_USER_PRESENT);
-            filter.addAction(Intent.ACTION_SCREEN_OFF);
-            registerReceiver(screenReceive, filter);
-
-            //啟用抓天氣api
-            startWeatherAlarm();
-        }
+//        if (!intent.hasCategory(Constants.MainAppCreate)){
+//            //倘若不是由主程式進入
+//
+//            //偵測螢幕是否喚醒
+//            IntentFilter filter = new IntentFilter(Intent.ACTION_USER_PRESENT);
+//            filter.addAction(Intent.ACTION_SCREEN_OFF);
+//            registerReceiver(screenReceive, filter);
+//
+//            //啟用抓天氣api
+//            startWeatherAlarm();
+//        }
         //監聽點擊事件
         if (intent.getAction() != null){
             //每次點擊按鈕時，intent就會送一個廣播出來

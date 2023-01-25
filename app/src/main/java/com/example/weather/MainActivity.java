@@ -33,6 +33,7 @@ import com.example.weather.network.APICallback;
 import com.example.weather.page.Settings;
 import com.example.weather.service.WeatherBinder;
 import com.example.weather.service.WeatherService;
+import com.example.weather.service.WeatherServiceConnect;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
 import com.example.weather.utils.GeocoderMgr;
@@ -219,21 +220,5 @@ public class MainActivity extends AppCompatActivity {
                 .navigationBarDarkIcon(sharedPrefUtils.getLastMode() == 0)
                 .navigationBarColor(bgColor)
                 .init();
-    }
-
-    //綁定的天氣類別
-    private class WeatherServiceConnect implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            //先轉型為WeatherBinder同時呼叫取得天氣資訊api
-            WeatherBinder weatherBinder = (WeatherBinder) iBinder;
-            weatherBinder.getWeatherData();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
     }
 }

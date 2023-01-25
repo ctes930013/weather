@@ -31,6 +31,16 @@ public class ServiceUtils {
     }
 
     /**
+     * 停用某個Service
+     *
+     * @param intent  Service的intent
+     *
+     */
+    public static void stopService(Context context, Intent intent) {
+        context.stopService(intent);
+    }
+
+    /**
      * 與某個Service作綁定
      *
      * @param intent  Service的intent
