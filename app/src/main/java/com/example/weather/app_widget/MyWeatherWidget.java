@@ -21,12 +21,11 @@ public class MyWeatherWidget extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         Boolean isRun = ServiceUtils.isServiceRun(context, WeatherService.class.getName());
         Log.d(TAG, "onUpdate: Service狀態: " + isRun);
-        Intent intent = new Intent(context, WeatherService.class);
-        if (isRun) {
-            //若當前服務有被啟用則先停用再啟用
-            ServiceUtils.stopService(context, intent);
+        if (!isRun) {
+            //若當前服務沒有被啟用則啟用服務
+            Intent intent = new Intent(context, WeatherService.class);
+            ServiceUtils.startRunService(context, intent);
         }
-        ServiceUtils.startRunService(context, intent);
     }
 
     /**接收廣播資訊*/
