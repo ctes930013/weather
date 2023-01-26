@@ -41,7 +41,9 @@ import com.example.weather.network.APICallback;
 import com.example.weather.utils.BitmapUtils;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
+import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
+import com.gyf.immersionbar.ImmersionBar;
 import com.intentfilter.androidpermissions.PermissionManager;
 import com.intentfilter.androidpermissions.models.DeniedPermissions;
 
@@ -337,6 +339,7 @@ public class WeatherService extends Service {
                     views.setTextViewText(R.id.txt_current_temp, weatherFutureModel.getNowTemp() + "°C");
                     views.setTextViewText(R.id.txt_current_rain, weatherFutureModel.getNowRainProb() + "%");
                     views.setTextViewText(R.id.txt_current_detail, weatherFutureModel.getNowDesc());
+                    views.setInt(R.id.lin_main, "setBackgroundResource", getCurrentMode());
 
                     updateAppWidget(views);
                 }
@@ -350,6 +353,18 @@ public class WeatherService extends Service {
         ComponentName componentName = new ComponentName(getApplicationContext(), MyWeatherWidget.class);
         //通知AppWidget的onUpdate
         manager.updateAppWidget(componentName, views);
+    }
+
+    /**根據當前模式，選擇佈景主題*/
+    private int getCurrentMode(){
+        SharedPrefUtils sharedPrefUtils = new SharedPrefUtils(getApplicationContext());
+        int bgColor;
+        if(sharedPrefUtils.getLastMode() == 0)
+            bgColor = R.drawable.gradient_light_background;
+        else
+            bgColor = R.drawable.gradient_night_background;
+
+        return bgColor;
     }
 
     /**實作天氣api的服務綁定的類別*/

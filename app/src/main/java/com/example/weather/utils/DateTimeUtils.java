@@ -1,5 +1,6 @@
 package com.example.weather.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -102,5 +103,19 @@ public class DateTimeUtils {
         if (w < 0)
             w = 0;
         return weekDays[w];
+    }
+
+    /**
+     * 根據時段選擇背景顏色
+     *
+     */
+    public static void setCurrentMode(Context context){
+        SharedPrefUtils sharedPrefUtils = new SharedPrefUtils(context);
+        int hours = Integer.parseInt(convertDistinctFormat("HH", getNowTime()));
+        if (hours >= 6 && hours <= 18) {
+            sharedPrefUtils.setLastMode(0);
+        } else {
+            sharedPrefUtils.setLastMode(1);
+        }
     }
 }

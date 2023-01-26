@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefUtils = new SharedPrefUtils(this);
 
         //根據時段選擇背景顏色
-        setCurrentMode();
+        DateTimeUtils.setCurrentMode(this);
         getCurrentMode();
 
 
@@ -206,16 +206,6 @@ public class MainActivity extends AppCompatActivity {
             //若當前服務有被啟用則直接綁定服務
             WeatherServiceConnect weatherServiceConnect = new WeatherServiceConnect();
             ServiceUtils.bindService(MainActivity.this, intent, weatherServiceConnect);
-        }
-    }
-
-    //設定當前模式
-    private void setCurrentMode(){
-        int hours = Integer.parseInt(DateTimeUtils.convertDistinctFormat("HH", DateTimeUtils.getNowTime()));
-        if (hours >= 6 && hours <= 18) {
-            sharedPrefUtils.setLastMode(0);
-        } else {
-            sharedPrefUtils.setLastMode(1);
         }
     }
 
