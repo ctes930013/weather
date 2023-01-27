@@ -176,10 +176,10 @@ public class MainActivity extends AppCompatActivity {
         //呼叫中央氣象局的api
         runService();
         //檢查是否有更改過地區，有要通知桌面小工具
-        if(sharedPrefUtils.getIsChangeCity()){
-            notifyAppWidget();
-            sharedPrefUtils.setIsChangeCity(false);
-        }
+//        if(sharedPrefUtils.getIsChangeCity()){
+//            notifyAppWidget();
+//            sharedPrefUtils.setIsChangeCity(false);
+//        }
     }
 
     //通知桌面小工具更新資料

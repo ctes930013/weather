@@ -41,6 +41,7 @@ import com.example.weather.network.APICallback;
 import com.example.weather.utils.BitmapUtils;
 import com.example.weather.utils.Constants;
 import com.example.weather.utils.DateTimeUtils;
+import com.example.weather.utils.Route;
 import com.example.weather.utils.SharedPrefUtils;
 import com.example.weather.utils.WeatherImg;
 import com.gyf.immersionbar.ImmersionBar;
@@ -67,7 +68,7 @@ public class WeatherService extends Service {
     //時間的handler的唯一值tag
     private final int dateHandlerFlag = 1;
     //抓天氣api的時間間隔(ms)
-    private final int weatherTimeInterval = 600000;
+    private final int weatherTimeInterval = 3600000;
     //抓天氣api的定時器的tag
     private final String ALARM_ACTION = "weather_alarm";
     //抓天氣api的定時器
@@ -198,6 +199,7 @@ public class WeatherService extends Service {
         if (intent.getAction() != null){
             //每次點擊按鈕時，intent就會送一個廣播出來
             if (intent.getAction().equals(UPDATE_EVENT)){
+                //更新
                 Log.d(TAG, "Click method ");
                 checkPermission();
 
@@ -224,10 +226,13 @@ public class WeatherService extends Service {
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.my_weather_widget);
         Intent myIntent = new Intent();
         myIntent.setAction(UPDATE_EVENT);
-
         //設定按鈕點擊事件，使用PendingIntent作為發送intent
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, myIntent, 0);
         remoteViews.setOnClickPendingIntent(R.id.img_update, pendingIntent);
+        Intent appIntent = new Intent(getApplicationContext(), MainActivity.class);
+        //設定背景點擊事件，使用PendingIntent開啟首頁
+        PendingIntent appPendingIntent = PendingIntent.getActivity(this, 0, appIntent, 0);
+        remoteViews.setOnClickPendingIntent(R.id.lin_main, appPendingIntent);
         manager.updateAppWidget(thisWidget, remoteViews);
     }
 
