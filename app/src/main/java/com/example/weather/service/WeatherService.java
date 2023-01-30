@@ -316,7 +316,7 @@ public class WeatherService extends Service {
             mEventBus.post(weatherEventData);
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "獲取天氣資訊失敗", Toast.LENGTH_SHORT).show();
                 }
             });
         }
